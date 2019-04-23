@@ -1,1 +1,64 @@
+#go to home directory to install hive, make sure that hive is install in the same level as hadoop
+cd
+
+#download the hive for instalation
+wget http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/apache-hive-2.0.1-bin.tar.gz
+gunzip apache-hive-2.0.1-bin.tar.gz
+tar xvf apache-hive-2.0.1-bin.tar
+
+#set the enviorment variables (can be automated by adding these lines in ~/.bashrc)
+#if we don't do this, we will have to set these variables everytime we use hive
+export HIVE_HOME=/home/ec2-user/apache-hive-2.0.1-bin
+export PATH=$HIVE_HOME/bin:$PATH
+
+$HADOOP_HOME/bin/hadoop fs -mkdir /tmp 
+$HADOOP_HOME/bin/hadoop fs -mkdir /user/hive/warehouse
+
+#download the vehicle data
+wget http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/vehicles.csv
+
+#2 ways to take a look at the data 
+nano vehicles.csv 
+more vehicles.csv ##you can press space to scroll and q or Ctrl-C to break out
+
+#Create the ec2-user directory on the HDFS side 
+hadoop fs -mkdir /user/ec2-user/
+
+#Run hive 
+cd $HIVE_HOME
+$HIVE_HOME/bin/schematool -initSchema -dbType derby
+##This command initializes the database metastore. 
+##If you need to restart/reformat or see errors related to meta store, 
+##run rm -rf metastore_db/ and then repeat the above initSchema command
+
+#create a table into the Hive terminal
+bin/hive
+
+CREATE TABLE VehicleData ( 
+barrels08 FLOAT, barrelsA08 FLOAT, 
+charge120 FLOAT, charge240 FLOAT,
+city08 FLOAT) 
+ROW FORMAT DELIMITED FIELDS 
+TERMINATED BY ',' STORED AS TEXTFILE;
+
+#load the data (from local file system, not HDFS)
+LOAD DATA LOCAL INPATH '/home/ec2-user/vehicles.csv' 
+OVERWRITE INTO TABLE VehicleData;
+
+#Run a couple of HiveQL queries to verify that everything is working properly
+SELECT COUNT(*) FROM VehicleData;
+
+SELECT MIN(barrels08), AVG(barrels08), MAX(barrels08) FROM VehicleData;
+
+SELECT (barrels08/city08) FROM VehicleData;
+
+#output three of the columns into a separate file 
+INSERT OVERWRITE DIRECTORY 'ThreeColExtract' 
+SELECT barrels08, city08, charge120
+FROM VehicleData;
+##The file would be created in HDFS in user home directory (/user/ec2-user/ThreeColExtract)
+
+#Exit Hive
+exit
+
 
