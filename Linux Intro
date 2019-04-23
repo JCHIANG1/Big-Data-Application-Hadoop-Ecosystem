@@ -1,0 +1,51 @@
+#create a text file called test.txt with nano editor
+$nano test.txt
+
+#comfirm the file has been saved by listing the files in the working directory
+$ls
+
+#display the contens of the file on the screen 
+$cat test.txt
+
+#make a copy of the test.txt file
+$cp test.txt test2.txt
+
+#remove the test2.txt fiel
+$rm test2.txt
+
+#create a directory to put files
+$mkdir folder
+
+#print the current directory
+$pwd
+
+#return to the home directory (home directory is “/home/[user name]”)
+$cd
+
+#move up one directory level
+$cd..
+
+#move the file to the new directory csc555
+$mv test.txt csc555/
+
+#zip the file
+$zip my zipfile test.txt
+
+#zip the file with wildcard symbol
+$zip myzipfile *
+#NOTE: * is the wildcard symbol that matches everything in current directory. If 
+
+#move the zip file to the home directory
+$mv myzipfile.zip /home/ec2-user/
+
+#extract the file
+$unzip myzipfile.zip
+
+#remove the directory
+$rm -rf csc555/
+#Executing “rm -rf” has the potential to delete ALL files in a given directory, 
+#including sub-directories (“r” stands for recursive). 
+
+#download a file from the web
+$wget http://www....
+#The file should be saved as “grail” by default
