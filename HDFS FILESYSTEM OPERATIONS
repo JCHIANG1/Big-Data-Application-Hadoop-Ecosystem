@@ -1,3 +1,39 @@
+#Start HDFS, Hadoop and history server 
+start-dfs.sh
+start-yarn.sh
+mr-jobhistory-daemon.sh start historyserver
+
+#verufy if everything is running
+jps
+
+#create a destination directory
+hadoop fs -mkdir/data
+
+#download large text file from http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/bioproject.xml 
+wget http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/bioproject.xml 
+
+#copy the file to HDFS for processing
+hadoop fs -put bioproject.xml /data/
+
+#varify the file was uploaded to HDFS 
+hadoop fs -ls /data
+
+#Run word count on the downloaded text file, using the time command to determine the total runtime of the MapReduce job.
+time hadoop jar hadoop-2.6.4/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.4.jar  wordcount /data/bioproject.xml /data/wordcount1
+##This invokes the wordcount example built into the example jar file, 
+##supplying /data/bioproject.xml as the input and /data/wordcount1 as the output directory. 
+
+#Report the size of a particular file or directory in HDFS. The output file will be named part-r-00000
+hadoop fs -du /data/wordscount1/
+
+#To determine the count of occurrences of “arctic”
+hadoop fs -cat /data/wordcount1/part-r-00000 | grep arctic
+##the command above outputs the entire content of part-r-00000 file and uses pipe | operator to filter it through grep (filter) command.
+##Just like in Linux, the cat HDFS command will dump the output of the entire file to screen 
+##grep command will filter the output to all lines that matches this particular word
+
+
+--------------------------------------------------------------------------------------------------------------------------------
 #copying a file from the local filesystem to HDFS
 %hadoop fs -copyFromLocal docs/test.txt \ hdfs://localhost/user/rae/test2.txt
 
