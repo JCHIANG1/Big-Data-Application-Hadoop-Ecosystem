@@ -1,0 +1,64 @@
+#List all contents of the current directory in long list format
+$ls -l
+#The 1st column gives information regarding file permissions 
+#The 2nd Column is the number of links to the file. 
+#The 3rd and 4th columns are the owner and the group of the file. 
+#The 5th column displays the size of the file in bytes. 
+#The 6th column is the date and time the file was last modified. 
+#The 7th column is the file or directory name.
+
+#List all contents of the current directory in long list and human readable formats. 
+#“-h” will put large files in more readable units than bytes. 
+$ ls -lh
+
+#If the content of the file is too large, you can show one page of the content by
+$ more grail
+#The file is saved as “grail” by default when download from web
+#Hit the spacebar to go to the next page. 
+#Type “b” to go page up, hit “space” key to go page down. Type “q” to quit.
+
+$ less grail
+#Less has more options than more (“less is more and more is less”). 
+#use the keyboard Arrows and Page Up/Down to scroll. 
+#type “h” for help, which will display additional options.
+
+#pipe the output from cat to more
+#A pipe redirects the output from one program to another program for further processing, 
+#and it is represented with “|”.
+#The cat command has the -n option, which prints line numbers,
+but we may also want to use more to view the file one page at a time.
+$ cat -n grail | more
+
+#Redirect the standard output (stdout) of a command. 
+$ cat myfile.txt > redirect.txt
+$ ls -lh > redirect2.txt
+
+#append the standard output to a file
+$ cat mycopy.txt >> myfile.txt
+#mycopy.txt will be appended to myfile.txt
+#Note: “cat mycopy.txt > myfile.txt” will overwrite myfile.txt with the contents output by “cat mycopy.txt”. 
+#Thus using >> is crucial if you want to preserve the existing file contents.
+
+
+#The following represent roles:
+u – user, g – group, o – others, a - all 
+#The following represent permissions:
+r – read, w – write, x – execute
+#Remove the read permission for your user on a file.
+$ chmod u-r myfile.txt
+
+
+#Give user read permission on a file. 
+$ chmod u+r myfile.txt
+
+#install python in your system
+$sudo yum install python
+
+#create a python file with nano text editor
+$ nano lucky.py
+
+#run the python program
+$ python.lucky.py
+
+#redirect the output to a file
+$ python lucky.py > lucky.txt
