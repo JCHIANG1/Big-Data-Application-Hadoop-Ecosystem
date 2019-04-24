@@ -5,9 +5,9 @@ $HIVE_HOME/bin/schematool -initSchema -dbType derby
 ##If you need to restart/reformat or see errors related to meta store, 
 ##run rm -rf metastore_db/ and then repeat the above initSchema command
 
-#create a table into the Hive terminal
 bin/hive
 
+#create a table into the Hive terminal
 CREATE TABLE VehicleData ( 
 barrels08 FLOAT, barrelsA08 FLOAT, 
 charge120 FLOAT, charge240 FLOAT,
