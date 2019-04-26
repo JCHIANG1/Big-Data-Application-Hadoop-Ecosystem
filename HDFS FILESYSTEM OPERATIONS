@@ -1,3 +1,39 @@
+#The view and content of HDFS will be different from local file system
+
+#lsting root directory 
+hadoop fs -ls/
+
+#create several directories
+hadoop fs -mkdir hadoop_test1
+hadoop fs -mkdir hadoop_test2
+hadoop fs -mkdir hadoop_test3
+
+#copying a file from the local filesystem to HDFS
+hadoop fs -copyFromLocal docs/test.txt hadoop_test1
+
+#copying a file from HDFS to local
+hadoop fs -copyToLocal  hadoop_test1/test.txt .
+
+#move a file from one folder to another
+hadoop fs -mv hadoop_test1/test.txt hadoop_test2
+
+#copy a file from one folder to another
+hadoop fs -cp hadoop_test2/test.txt hadoop_test3
+
+-----------------------------------------------------------------------------------------------------------------------------
+#we could have omitted the scheme and host of the URl and picked up the default, hdfs://localhost, 
+#as specified in core-site.xml:
+hadoop fs -copyFromLocal docs/text.txt /user/rae/test2.txt
+
+#We also could have used a relative path and copyed the file to our home directory in HDFS, 
+#which in this case is /user/rae:
+hadoop fs -copyFromLocal docs/text.txt test2.txt
+
+#To list the files in the root directory of the local filesystem
+hadoop fs -ls file:///
+
+--------------------------------------------------------------------------------------------------------------------------------
+
 #Start HDFS, Hadoop and history server 
 start-dfs.sh
 start-yarn.sh
@@ -33,17 +69,3 @@ hadoop fs -cat /data/wordcount1/part-r-00000 | grep arctic
 ##grep command will filter the output to all lines that matches this particular word
 
 
---------------------------------------------------------------------------------------------------------------------------------
-#copying a file from the local filesystem to HDFS
-%hadoop fs -copyFromLocal docs/test.txt \ hdfs://localhost/user/rae/test2.txt
-
-#we could have omitted the scheme and host of the URI and picked up the default, hdfs://localhost, 
-#as specified in core-site.xml:
-%hadoop fs -copuFromLocal docs/text.txt /user/rae/test2.txt
-
-#We also could have used a relative path and copied the file to our home directory in HDFS, 
-#which in this case is /user/rae:
-%hadoop fs -copuFromLocal docs/text.txt test2.txt
-
-#To list the files in the root directory of the local filesystem
-%hadoop fs -ls file:///
