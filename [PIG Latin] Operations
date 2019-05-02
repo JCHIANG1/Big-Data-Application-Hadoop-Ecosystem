@@ -1,0 +1,46 @@
+#list the top 10 stock symbol in year 2003 with the highest volume using pig
+
+#load the dataset
+stocks = LOAD '/user/hirw/input/stocks' USING PigStorage(',') as (exchange:chararray, symbol:chararray, date:datetime, open:float, high:float, low:flowt, close:float, volume:float, adj_close:float);
+
+#filtering only records from year 2003
+filter_by_yr = FILTER stocks by GetYear(date) == 2003;
+
+#Grouping records by symbol
+grp_by_sym = GROUP filter_by_yr BY symbol;
+
+#calculate average volume on the grouped records
+avg_volume = FOREACH grp_by_sym GENERATE group, ROUND(AVG(filter_by_yr.volume)) as avgvolume;
+#we can use DESC grp_by_sym to look into the struvture to understand why use filter_by_yr.volume
+
+#order the result in descending order
+avg_vol_ordered = ODER avg_volume BY avgvolume DESC;
+
+#store top 10 records
+top10 = LIMIT avg_vol_ordered 10;
+STORE top10 INTO 'ouput/pig/'avg-volume' USING PigStorage(',');
+
+-----------------------------------------
+#put the above instructions into a script 
+#copy all the instuctions above into a file and save the file
+#to exercute the file to conduct the map reduce job
+pig '/hirw-workshop/pig/scripts/average-volume.pig'; #the file location
+
+#check the file from the reducer
+hadoop fs -ls ouput/pig/'avg-volume
+
+#read the ouput file from the reducer
+hadoop fs -cat ouput/pig/'avg-volume/part-r-00000
+
+#to alter the input and output direction
+#in the script and make some adjustment
+LOAD '$input' USING PigStorage(',') as ();
+STORE top110 INTO '$OUTPUT' USING PigStorage(',');
+
+#passing parameters to script
+pig -param input=/user/hirw/input/stocks -param output=output/pig/avg-volume-params /hirw-workshop/pig/scripts/average-volume-parameters.pig
+#the last directory is where the scipt is 
+
+#running the pig script locally, input and output locations are positioned in the local file system
+pig -x loocal -param input=/hirw-workship/input/stocks-dataset/stocks -param output=output/stocks /hirw-workshop/pig/scripts/average-volume-parameters.pig
+
