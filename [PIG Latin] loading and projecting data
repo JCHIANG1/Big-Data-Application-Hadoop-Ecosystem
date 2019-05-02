@@ -1,1 +1,55 @@
+#A stock data set is a comma delimiter text fil
+
+#to work in the pig we have to enter the pig ground shell to exercute the pig instructions
+cd /user/lib/pig
+ls -ltr
+pig
+
+#load the dataset from HDFS to PIG
+stocks= LOAD '/user/hirw/input/stocks'  #the loation of the dataset in HDFS
+USING PigStorage(',') as                #the delimiter of the dataset
+(exchange:chararray, symbol:chararray, date:datetime, open:float, high:float, low:float, close:float, volume:int, adj_close:float);
+
+#structure
+#in pig latin the dataset is refered as a relation, the command will output the datatype of the columns
+DESC stocks;
+
+#Transform: project and manipulate few columns from dataset
+projection =FOREACH stocks GENERATE symbol, SUBSTRING(exchange,0,1) as sub_exch, close-open as up_or_down;
+#for each record in the stocks relation generate generate symbol, get the first 2 char of the exchange column...
+#the index in pig latin starts from 0
+
+#pig generate the mapreduce job only when we store or print the result set
+#print result on screen
+DUMP projection;
+
+#store result in HDFS
+STORE projection INTO 'output/pig/simple-projection'; #the HDFS location
+#make sure the directory did not exist in the HDFS or the exercution will fail
+
+-------------------------
+#2 other ways of loading dataset
+#LOAD 1 - with no column names and datatypes
+stocks = LOAD '/user/hirw/input/stocks' USING PigStorage(','); 
+
+#learn about the relation structure
+DESC stocks
+#the ouput shows the stocks schema is unknown
+
+#exercute the transformation when the column name is unknown
+projection = FOREACH stocks GENERATE $1 as symbol, SUBSTRING($0,0,1) as sub_each, $6 - $3 as up_or_down;
+#the index starts in 0
+
+#when we don't specify the data type, pig assumes the data type to be bytearray by default
+#base on the operation we perform pig will convert the data type to appropriate form
+DESC projection;
+
+#LOAD 2 - with column names but no datatype
+stocks = LOAD '/user/hirw/input/stocks' USING PigStorage(',') as
+(exchange, symbol, date, open, high, low, close, volume, adj_close);
+
+#see the relation structure
+DESC stocks
+#all the columns are in bytearray data type
+
 
