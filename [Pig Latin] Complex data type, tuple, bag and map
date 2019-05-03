@@ -1,0 +1,54 @@
+#continue from the last file [Pig Latin] Operation
+
+#tuple () vs. bag {}
+#tuple = row
+#bag = collection of rows/tuples, is more like a table
+
+#look at the structure of the group_by_sym
+DESC group_by_sym;
+
+#project nested columns
+close_by_sym =FOREACH grp_by_sym GENERATE group, filte_by_yr.colse;
+limit10 = LIMIT clos_by_sym 10;
+DUMP limit10;
+
+#finding max close price by symbol
+max_close_by_sym=FOREACH close_by_sym GENERATE group, MAX(close_by_sym.close);
+
+#group by more than one column
+#we want to know the maximum closing price for each symbol by year
+grp_by_sym_yr= GROUP stocks BY (symbol, GetYear(date));
+DESC grp_by_sym_yr'
+max_close_by_sym_yr=FOREACH grp_by_sym_yr GENERATE group, MAX(stocks.price);
+
+#project individual columns
+max_close_by_sym_yr=FOREACH grp_by_sym_yr GENERATE group.symbol, group.$1, MAX(stocks.price);
+
+#store the columns into HDFS in default delimiter the tab
+STORE grp_by_sym_yr into 'output/pig/grp_by_sym_yr'; #if we want the comma delimiter use USING PigStorage(',')
+
+#look at the relation structure
+hadoop fs -ls output/pig/grp_by_sym_yr
+hadoop fs -cat output/pig/grp_by_sym_yr/part-r-00000
+
+#define a pig relation using complex types
+complex_type=LOAD 'output/pig/grp_by_sym_yr' as
+(
+grp:tuple(sym:chararray,yr:int),
+stocks_b:{stocks_t(exchange:chararray, symbol:chararray, date:datetime, open:float, high:float, low:float, close:float, volume:int, adj_close:float)}
+);
+
+max_vol_by_yr = FOREACH complex_type GENERATE grp.sym, grp.yr, MAX(stocks_b.volume);
+limit10 = LIMIT max_vol_by_yr 10;
+DUMP limit10;
+
+#complex type - MAP
+#some example of the map (the adress part) in semi colum delimeter format
+328;Admin hearing;[street#939 E RD, city#chicago, state#IL] 
+#map is always in square bracket and the key and value is seperate by #, and each key and value paire is seperate by comma
+
+#loading the max data type
+departments = LOAD'/user/hirw/input/employee-pig/department_dataset_chicago' USING PigStorage(';') AS (dept_id:int, dept_name:chararray, address:map[]);
+dept_addr = FOREACH departments GENERATE dept_name, address#'street' as street, address#city as city, address#state as state;
+
+
