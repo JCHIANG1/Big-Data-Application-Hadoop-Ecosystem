@@ -1,0 +1,81 @@
+#Use the SSBM schema (http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/SSBM1/SSBM_schema_hive.sql) to load the Part table into Hive 
+(data available at http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/SSBM1/part.tbl)
+Then use Hive user defined function to perform the following transformation on Part table 
+(creating a new PartSwap table): in the 2nd column/p_name swap the two words in the column and add the length of the shortest word. 
+For example, rose moccasin would become moccasin rose4 or honeydew dim would be dim honeydew3. 
+
+
+#dowload files to the local file system
+wget http://rasinsrv07.cstcis.cti.depaul.edu/CSC555/SSBM1/part.tbl
+
+#take a look at the part table
+less part.tbl
+#we can see that the delimiter of the data is "|"
+
+#create a python script
+#Note that the transform python code (split/join) should always use tab (‘\t’) between fields even if the source data is "|" separated
+import sys
+
+for line in sys.stdin:
+    line = line.strip()
+    vals = line.split('\t')
+    s_name = vals[1]
+    w1,w2=s_name.split()
+    vals[1] =w2+' '+w1+str(min(len(w1),len(w2)))
+    same_partkey, swap_name, same_mfgr, same_category, same_brand1, same_color,  
+    same_type, same_size, same_container=vals      
+    print('\t'.join([str(same_partkey),swap_name, same_mfgr, same_category, same_brand1, same_color, same_type,str(same_size), same_container]))
+    
+    
+#move python files to HDFS
+hadoop fs -copyFromLocal mapper.py hdfs:///user/hive/warehouse/
+
+
+#create 2 tables in hive
+create table part (
+  p_partkey     int,
+  p_name        varchar(22),
+  p_mfgr        varchar(6),
+  p_category    varchar(7),
+  p_brand1      varchar(9),
+  p_color       varchar(11),
+  p_type        varchar(25),
+  p_size        int,
+  p_container   varchar(10)    
+)
+ROW FORMAT DELIMITED FIELDS 
+TERMINATED BY '|'; 
+
+#load data to hive table from local file system
+LOAD DATA LOCAL INPATH '/home/ec2-user/part.tbl' OVERWRITE INTO TABLE part;
+
+CREATE TABLE PartSwap
+ (
+  same_partkey     int,
+  swap_name        varchar(25),
+  same_mfgr        varchar(6),
+  same_category    varchar(7),
+  same_brand1      varchar(9),
+  same_color       varchar(11),
+  same_type        varchar(25),
+  same_size        int,
+  same_container   varchar(10)    
+)
+ROW FORMAT DELIMITED FIELDS 
+TERMINATED BY '\t';
+
+#import file into HIVE
+ADD FILE hdfs:///user/hive/warehouse/mapper.py;
+
+#carrying out the transformation
+INSERT OVERWRITE TABLE PartSwap
+SELECT TRANSFORM (p_partkey, p_name, p_mfgr, p_category, p_brand1, p_color, p_type, p_size, p_container)
+USING 'python mapper.py' 
+AS (same_partkey, swap_name, same_mfgr, same_category, same_brand1, same_color, same_type, same_size, same_container) FROM part;
+
+
+
+
+
+
+
