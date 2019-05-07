@@ -3,6 +3,9 @@
 #lsting root directory 
 hadoop fs -ls/
 
+#list all the subdirectories
+hadoop fs -ls -R / | grep "^d"
+
 #create several directories
 hadoop fs -mkdir hadoop_test1
 hadoop fs -mkdir hadoop_test2
