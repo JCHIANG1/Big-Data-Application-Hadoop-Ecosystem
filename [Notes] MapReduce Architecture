@@ -29,11 +29,14 @@ After receving the job requests from the client
  very serious situation, the cluster can not exercute the mapreduce work
 
 ---------------------------------------------------------------------------------------
- #Hadoop MRV2 version: Yarn
- #Overcome the problem form version1 
+#Hadoop MRV2 version: Yarn
+nano hadoop-2.6.4/etc/hadoop/yarn-site.xml
+
+#Overcome the problem form version1 
  -avoid job tracker to take on all the responsiblity to slow down the performance
  -manage the cluster resource with thememory setting: we don't have to config the number of mapper and reducer that are allowed 
-                                                      to exercute on the node, client can requst the specific memory for mappers and reducers
+  to exercute on the node, client can requst the specific memory for mappers and reducers
+
 #architecture
 -job tracker is replaced by Resource Manager and Application master 
 -task tracker is replaced by Node Manager
