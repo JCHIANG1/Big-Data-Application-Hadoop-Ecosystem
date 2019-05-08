@@ -1,0 +1,31 @@
+#use this command to see whether the staus of file is healthy or not
+#it will also tell you the number of block the file is made of and their node location
+hadoop fs -fack /path/to/file/or/dataset
+
+#datanode(slaves node) vs. namenode(master node)
+- The node where blocks are physically stored are known as the data node, data node only knows about the block it is resposible for.
+  The name node on the otherhand, keep tracks of all the file information in HDFS, these information includes the list of blocks that make up
+  of the file and their storage location.
+- note that name node stores all the meta data files and folder in the disk but it stores the block location is the memory because 
+  the new file might constantly coming into the cluster for performance reason it hold the information in the memory. 
+- Datanodes are in constant communication with the name node for it to keep track of the block location information.
+- Namenode often have high memory compared to the datanode, whereas the datanode is high in disk storage because it has to store the actual data
+
+#config file
+#any nodes can look up the name node propertyy below
+nano hadoop-2.6.4/etc/hadoop/core-site.xml
+
+<configuration>
+<property>
+  <name>fs.defaultFS</name>
+  <value>hdfs://localhost/</value>  #the location of the name node
+</property>
+</configuration>
+
+#file that lists all the hdfs property information 
+#the information includes, namenode/datanode file storage location, and replication of factor of the cluster/ an online dashboard
+nano hadoop-2.6.4/etc/hadoop/hdfs-site.xml
+
+#Rack vs Cluster
+-rack is a group of nodes collected in the network
+-cluster is a group of racks connected in the network
