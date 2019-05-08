@@ -1,0 +1,64 @@
+#Hadoop MRV1 version: Job tracker/ Task tracker
+-job tracker operates on the seperate node (not on namenode or datanode)
+-task tracker operates on all the datanode
+
+After receving the job requests from the client
+#client task
+-preliminary check for job exercution (make sure the input directory exists)
+-compute the input splits required to exercute the jobs and send the info to job tracker
+
+#job tracker task (job coordination/scheduling/resource management)
+-depend on the number of the splits to assign equvilent number of mappers
+-before exercuting the mapper on the node, job tracker will consider
+ 1. if the node has enough capacity to run the mapper (this is set during the cluster set up)
+ 2. if the mapper can be exercuted on the same node where data is resided
+-assign appropriate nodes for reducers
+-job tracker has the global view of the jobs that are running to report the progress of MR job back to the client
+
+#task tracker task
+-task tracker running on each datanode monitor the individual mappers and reducers, all the task trackers will be constant communication with
+ the job tracker 
+ 
+ #if the task fail (map phase or reduce phase)
+ the job tracker will arrange the same task on another node
+ 
+ #if the task tracker fail
+ the task on the node will be abandon, the job tracker will arrange the same task on another node
+ 
+ #if the job tracker fail
+ very serious situation, the cluster can not exercute the mapreduce work
+
+---------------------------------------------------------------------------------------
+ #Hadoop MRV2 version: Yarn
+ #Overcome the problem form version1 
+ -avoid job tracker to take on all the responsiblity to slow down the performance
+ -manage the cluster resource with thememory setting: we don't have to config the number of mapper and reducer that are allowed 
+                                                      to exercute on the node, client can requst the specific memory for mappers and reducers
+#architecture
+-job tracker is replaced by Resource Manager and Application master 
+-task tracker is replaced by Node Manager
+
+#Resource Manager
+-operates on the seperate node (not on namenode or datanode)
+-received the request from the client and create the container in the node manager to launch the application master
+-allocate resources request by the application master, by default, there is 1GB for each mapper and reducer 
+
+#Node Manager
+-operates on all the datanode
+-the cluster resources is managed in the container, inside which the node manager will exercute the application master
+-monitor the progress of the task in the container and update the application master for progress
+
+#Application Master
+-operate in the node manager
+-job coordination and report the progress to the clients
+
+#if the task fails (the mapper or reducer)
+-the node manager will notify the application master, and the application master will contact the resource manager for a new container
+ to kick off the fail task
+ 
+#if the application master fails
+-the resource manager will start a new application master in another node, the task thar are already completed don't have to re-exercuted
+
+#if the node manager fails
+-the resourse manager will not reassign a new container to the node manager
+
