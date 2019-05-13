@@ -15,7 +15,7 @@ city08 FLOAT)
 ROW FORMAT DELIMITED FIELDS 
 TERMINATED BY ',' STORED AS TEXTFILE;
 
-#load the data (from local file system, not HDFS)
+#load the data (from local file system, not HDFS, HIVE is the exception among other tools that let us load from local file system)
 LOAD DATA LOCAL INPATH '/home/ec2-user/vehicles.csv' 
 OVERWRITE INTO TABLE VehicleData;
 
