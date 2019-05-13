@@ -40,7 +40,7 @@ hadoop fs -ls file:///
 #Start HDFS, Hadoop and history server 
 start-dfs.sh
 start-yarn.sh
-mr-jobhistory-daemon.sh start historyserver
+mr-jobhistory-daemon.sh start historyserver #to exercute hive this line is not required, but for pig it does
 
 #verufy if everything is running
 jps
