@@ -75,7 +75,7 @@ AS (same_partkey, swap_name, same_mfgr, same_category, same_brand1, same_color, 
 
 
 #debuging
-cat data/location | python.py
+cat data/local/location | python.py
 
 
 
