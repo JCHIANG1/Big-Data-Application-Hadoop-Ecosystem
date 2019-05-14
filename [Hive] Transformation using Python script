@@ -74,6 +74,10 @@ USING 'python mapper.py'
 AS (same_partkey, swap_name, same_mfgr, same_category, same_brand1, same_color, same_type, same_size, same_container) FROM part;
 
 
+#debuging
+cat data/location | python.py
+
+
 
 
 
