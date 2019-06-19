@@ -1,0 +1,16 @@
+1. create a 3-node cluster with medinum size (with a total of 1 master + 2 worker nodes). 
+
+2. changing the default 8G hard drive to 30G on all nodes.
+
+3. change the security group setting to open firewall access. (Right click on the security group and choose Edit inbound rules on AWS interface)
+a) default (port 22 is required for regular SSH connections)
+b) open port 50070 for the web interface to see the cluster status in a browser. 
+c) set 0-64000 range opening up all ports to ensure that the ports are open only within the cluster and not to the world.
+(assuming that all of your nodes in the cluster share the same security group – that will happen automatically if use the “create more like this” option when creating instances)
+
+4. After setting the master node, right click on the master node and choose “create more like this” to create 2 more nodes with same settings. 
+If configure the network settings on master first, security group information will be copied. 
+NOTE: Hard drive size will not be copied and default to 8G unless you change it.
+
+5.Connect to the master and set up Hadoop once on the master node, 
+
