@@ -1,0 +1,44 @@
+7. generate and copy the public key of the master node to the worker nodes to achieve passwordless access across the cluster.
+#The command will generate the public key and private key
+
+ssh-keygen -t rsa #enter empty values for the passphrase on the master node
+
+.ssh/id_rsa.pub #Manually copy the public key
+
+~/.ssh/authorized_keys #append the master public key on each worker node
+
+#also need to pass the public key to master node itself, we can simply do this wiht this command
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authoirzed_keys 
+
+8. make sure we are able to log in to all the nodes from the master (include the master itself)
+ssh #with private IP address
+exit # to exit
+
+9.pack up and move Hadoop to the workers.
+#pack up the entire Hadoop directory into a single file for transfering
+tar cvf myHadoop.tar hadoop-2.6.4
+
+#verify that the .tar file had been created
+ls -al myHadoop.tar
+
+#copy the myHadoop.tar file to every non-master node in the cluster
+#copies the myHadoop.tar file from the master node to the worker node into a file called myHadoopWorker.tar
+#since you are on the Amazon EC2 network, either Public or Private IP will work just fine here
+scp myHadoop.tar ec2-user@xx.xxx.xx.xxx:/home/ec2-user/myHadoopWorker.tar
+
+#Once the tar file containing your Hadoop installation from master node has been copied to each worker node
+#we can login to each non-master node and unpack the .tar file
+
+tar xvf myHadoopWorker.tar
+
+11. format the cluster on the master node
+hadoop namenode -format
+
+#nothing needs to be done on the workers to format the cluster unless you are re-formatting, 
+in which case we’ll need to delete the dfs directory
+
+start-all.sh
+#we do not need to explicitly start anything on worker nodes – the master will do that for us
+
+12. verify the cluster is running properly
+jps
