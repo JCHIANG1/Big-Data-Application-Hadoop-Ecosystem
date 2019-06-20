@@ -74,3 +74,22 @@ d)yarn-site.xml, user the privateIP of the master
   <name>yarn.nodemanager.aux-services</name>
   <value>mapreduce_shuffle</value>
 </property>
+
+#finallt edit the slaves file and list the 4 nodes (master and 3 workers) using private IPs
+nano hadoop-2.6.4/etc/hadoop/slaves
+
+#The advantage of the Private IP is that it does not change after your instance is stopped 
+(if you use the Public IP, the cluster would need to be reconfigured every time it is stopped). 
+The downside of the Private IP is that it is only meaningful within the Amazon EC2 network. 
+So all nodes in EC2 can talk to each other using Private IP, but you cannot connect to your instance from the outside 
+(e.g., from your laptop) because Private IP has no meaning for your laptop (since your laptop is not part of the Amazon EC2 network).
+
+
+
+
+
+
+
+
+
+
